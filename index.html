@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Verb Agreement Point 1 Exercise</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --gray: #f4f4f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        /* Result Bar Styling */
+        .result-bar {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .status-box {
+            width: 25px;
+            height: 25px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .correct { background-color: var(--success); color: white; border-color: var(--success); }
+        .incorrect { background-color: var(--danger); color: white; border-color: var(--danger); }
+
+        #question-text {
+            font-size: 1.2rem;
+            margin: 30px 0;
+            min-height: 60px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .answer-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            font-weight: 600;
+        }
+
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .btn-nav { background-color: #ddd; color: #333; }
+        .btn-yes { background-color: var(--primary); color: white; }
+        .btn-no { background-color: var(--success); color: white; }
+        
+        #score-display {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="result-bar" id="result-bar"></div>
+
+    <div id="quiz-box">
+        <h3 id="question-number">Question 1</h3>
+        <p id="question-text">Loading question...</p>
+
+        <div class="controls">
+            <button id="prev-btn" class="btn-nav">Previous</button>
+            
+            <div class="answer-group">
+                <button id="yes-btn" class="btn-yes">Left</button>
+                <button id="no-btn" class="btn-no">Right</button>
+            </div>
+
+            <button id="next-btn" class="btn-nav">Next</button>
+        </div>
+    </div>
+
+    <div id="score-display">
+        <h2>Quiz Complete!</h2>
+        <p>Total Score: <span id="final-score">0</span> / 10</p>
+        <button onclick="location.reload()">Restart</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Their team members led by a newly appointed team leader <strong>has / have</strong> published important findings in a science journal.", a: "Right" },
+        { q: "A highly perceptive person sensitive to others’ subtle and complex emotions <strong>understand / understands</strong> people better.", a: "Right" },
+        { q: "Children who start studying certain subjects too early often <strong>suffer / suffers</strong> from much stress.", a: "Left" },
+        { q: "Soldiers serving in a dangerous war zone <strong>receive / receives</strong> greater respect for their sacrifice.", a: "Left" },
+        { q: "The reason why people start talking about the weather or current events <strong>is / are</strong> that they are harmless topics and of interest to everyone.", a: "Left" },
+        { q: "Stonehenge, a 4,000-year-old ring of stones, <strong>is / are</strong> a famous and mysterious ancient monument in Britain. ", a: "Left" },
+        { q: "When you smile genuinely, the skin between the eyebrow and upper eyelid <strong>is / are</strong> lowered slightly with true enjoyment.", a: true },
+        { q: "A common problem which affects around one third of stroke survivors <strong>is / are</strong> aphasia.  ", a: "Left" },
+        { q: "A study found that children living in city areas <strong>has / have</strong> higher rates of food allergies than those living in rural areas.", a: "Right" },
+        { q: "The most common reason to give flowers <strong>is / are</strong> to express romantic love.", a: "Left" }
+    ];
+
+    let currentIndex = 0;
+    let userAnswers = new Array(10).fill(null); // Stores true, false, or null
+
+    const resBar = document.getElementById('result-bar');
+    const qText = document.getElementById('question-text');
+    const qNum = document.getElementById('question-number');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    // Initialize Status Bar
+    function initStatusBar() {
+        resBar.innerHTML = '';
+        questions.forEach((_, i) => {
+            const div = document.createElement('div');
+            div.className = 'status-box';
+            div.id = `status-${i}`;
+            div.innerText = i + 1;
+            resBar.appendChild(div);
+        });
+    }
+
+    function updateUI() {
+        const currentQ = questions[currentIndex];
+        qNum.innerText = `Question ${currentIndex + 1}`;
+        qText.innerHTML = currentQ.q;
+
+        // Button States
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.innerText = currentIndex === questions.length - 1 ? "Finish" : "Next";
+
+        // Update Status Bar Visuals
+        questions.forEach((_, i) => {
+            const box = document.getElementById(`status-${i}`);
+            if (userAnswers[i] === null) {
+                box.className = 'status-box';
+                box.innerText = i + 1;
+            } else {
+                const isCorrect = userAnswers[i] === questions[i].a;
+                box.className = isCorrect ? 'status-box correct' : 'status-box incorrect';
+                box.innerText = isCorrect ? 'O' : 'X';
+            }
+        });
+    }
+
+    function handleAnswer(choice) {
+        console.log(choice)
+        userAnswers[currentIndex] = choice;
+        updateUI();
+    }
+
+    function showResults() {
+        document.getElementById('quiz-box').style.display = 'none';
+        const scoreDisplay = document.getElementById('score-display');
+        scoreDisplay.style.display = 'block';
+
+        const score = userAnswers.reduce((total, ans, i) => {
+            return (ans === questions[i].a) ? total + 1 : total;
+        }, 0);
+
+        document.getElementById('final-score').innerText = score;
+    }
+
+    // Event Listeners
+    document.getElementById('yes-btn').addEventListener('click', () => handleAnswer("Left"));
+    document.getElementById('no-btn').addEventListener('click', () => handleAnswer("Right"));
+    
+    prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateUI();
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentIndex < questions.length - 1) {
+            currentIndex++;
+            updateUI();
+        } else {
+            showResults();
+        }
+    });
+
+    // Start
+    initStatusBar();
+    updateUI();
+</script>
+
+</body>
+</html>
